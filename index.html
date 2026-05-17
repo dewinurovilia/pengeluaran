@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Pengeluaran Realtime</title>
-
+<p class="tanggal" id="tanggal"></p>
 <style>
 
 *{
@@ -191,6 +191,13 @@ padding:14px;
 
 .download-menu button:hover{
 background:#15803d;
+}
+.tanggal{
+text-align:center;
+margin-top:-15px;
+margin-bottom:20px;
+color:#64748b;
+font-size:15px;
 }
 </style>
 </head>
@@ -592,6 +599,8 @@ XLSX.writeFile(wb,`pengeluaran-bulanan-${bulan}.xlsx`);
 },{onlyOnce:true});
 
 }
+document.getElementById("tanggal").innerHTML =
+"Hari aktif : " + hari;
 </script>
 
 </body>
