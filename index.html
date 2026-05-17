@@ -3,11 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Pengeluaran Realtime</title>
 
 <style>
-body{
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 font-family:Arial,sans-serif;
+}
+
+body{
 background:#f1f5f9;
 padding:15px;
 }
@@ -24,7 +32,8 @@ box-shadow:0 10px 25px rgba(0,0,0,0.08);
 h1{
 text-align:center;
 margin-bottom:25px;
-font-size:28px;
+font-size:30px;
+color:#0f172a;
 }
 
 .card{
@@ -35,13 +44,13 @@ margin-bottom:20px;
 }
 
 .card h3{
-font-size:18px;
-margin-bottom:15px;
-color:#334155;
+font-size:17px;
+margin-bottom:10px;
+color:#475569;
 }
 
 .total{
-font-size:42px;
+font-size:40px;
 font-weight:bold;
 color:#ef4444;
 }
@@ -50,19 +59,45 @@ color:#ef4444;
 color:#2563eb;
 }
 
-input{
-width:100%;
-padding:16px;
-margin-bottom:15px;
-border-radius:15px;
+.input-group{
+margin-bottom:18px;
+}
+
+.input-group label{
+display:block;
+margin-bottom:10px;
+font-size:16px;
+font-weight:bold;
+color:#334155;
+}
+
+.input-box{
+display:flex;
+align-items:center;
+background:white;
 border:2px solid #e2e8f0;
-font-size:17px;
-outline:none;
+border-radius:18px;
+padding:0 15px;
 transition:0.2s;
 }
 
-input:focus{
+.input-box:focus-within{
 border-color:#2563eb;
+box-shadow:0 0 10px rgba(37,99,235,0.15);
+}
+
+.input-box span{
+font-size:22px;
+margin-right:10px;
+}
+
+.input-box input{
+width:100%;
+padding:16px 0;
+border:none;
+outline:none;
+font-size:17px;
+background:none;
 }
 
 button{
@@ -95,8 +130,15 @@ font-size:18px;
 animation:muncul 0.3s ease;
 }
 
-.item b{
+.item-name{
+font-weight:bold;
+color:#0f172a;
+}
+
+.item-price{
 font-size:22px;
+font-weight:bold;
+color:#ef4444;
 }
 
 #notif{
@@ -135,9 +177,14 @@ opacity:1;
 transform:translateY(0);
 }
 }
+
 </style>
 </head>
 <body>
+
+<div id="notif">
+✅ Pengeluaran berhasil ditambahkan
+</div>
 
 <div class="box">
 
@@ -153,11 +200,31 @@ transform:translateY(0);
 <div class="total month" id="bulanan">Rp0</div>
 </div>
 
-<input type="text" id="nama" placeholder="Nama Pengeluaran">
+<div class="input-group">
 
-<input type="number" id="jumlah" placeholder="Jumlah">
+<label>Nama Pengeluaran</label>
 
-<button onclick="tambah()">Tambah</button>
+<div class="input-box">
+<span>📝</span>
+<input type="text" id="nama" placeholder="Contoh : Jajan">
+</div>
+
+</div>
+
+<div class="input-group">
+
+<label>Jumlah Pengeluaran</label>
+
+<div class="input-box">
+<span>💰</span>
+<input type="number" id="jumlah" placeholder="Contoh : 10000">
+</div>
+
+</div>
+
+<button onclick="tambah()">
+Tambah Pengeluaran
+</button>
 
 <div id="list"></div>
 
@@ -165,7 +232,8 @@ transform:translateY(0);
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
 getDatabase,
@@ -173,18 +241,30 @@ ref,
 push,
 set,
 onValue
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 /* FIREBASE */
 
 const firebaseConfig = {
+
 apiKey: "AIzaSyAD8NyqcxooL2ga3dG918kYufrOn-5ZMwI",
+
 authDomain: "pengeluaran-c2c6d.firebaseapp.com",
-databaseURL: "https://pengeluaran-c2c6d-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+databaseURL:
+"https://pengeluaran-c2c6d-default-rtdb.asia-southeast1.firebasedatabase.app",
+
 projectId: "pengeluaran-c2c6d",
-storageBucket: "pengeluaran-c2c6d.firebasestorage.app",
+
+storageBucket:
+"pengeluaran-c2c6d.firebasestorage.app",
+
 messagingSenderId: "385326707991",
-appId: "1:385326707991:web:dd833732ad3b60e1d93352"
+
+appId:
+"1:385326707991:web:dd833732ad3b60e1d93352"
+
 };
 
 const app = initializeApp(firebaseConfig);
@@ -214,7 +294,9 @@ ref(db,"pengeluaran/"+bulan);
 /* FORMAT RUPIAH */
 
 function rupiah(angka){
+
 return "Rp" + angka.toLocaleString("id-ID");
+
 }
 
 /* TAMBAH DATA */
@@ -229,7 +311,7 @@ parseInt(document.getElementById("jumlah").value);
 
 if(!nama || !jumlah){
 
-alert("Lengkapi data");
+alert("Lengkapi data!");
 
 return;
 
@@ -245,7 +327,7 @@ waktu:Date.now()
 
 });
 
-/* NOTIF */
+/* NOTIFIKASI */
 
 const notif =
 document.getElementById("notif");
@@ -282,12 +364,19 @@ if(data.jumlah){
 
 total += data.jumlah;
 
-/* DATA BARU PALING ATAS */
+/* DATA TERBARU PALING ATAS */
 
 html = `
 <div class="item">
-<span>${data.nama}</span>
-<b>${rupiah(data.jumlah)}</b>
+
+<div class="item-name">
+${data.nama}
+</div>
+
+<div class="item-price">
+${rupiah(data.jumlah)}
+</div>
+
 </div>
 ` + html;
 
@@ -323,12 +412,14 @@ totalBulanan += data.jumlah;
 
 });
 
+});
+
 document.getElementById("bulanan").innerHTML =
 rupiah(totalBulanan);
 
 });
 
 </script>
+
 </body>
-<div id="notif">✅ Pengeluaran berhasil ditambahkan</div>
 </html>
