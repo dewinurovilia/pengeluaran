@@ -270,11 +270,18 @@ if(data.jumlah){
 
 total += data.jumlah;
 
-html += `
+html = `
 <div class="item">
 <span>${data.nama}</span>
 <b>${rupiah(data.jumlah)}</b>
 </div>
+` + html;
+html = `
+<div class="item">
+<span>${data.nama}</span>
+<b>${rupiah(data.jumlah)}</b>
+</div>
+` + html;
 `;
 
 }
