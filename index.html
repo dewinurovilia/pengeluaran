@@ -1,214 +1,245 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kasir Toko</title>
+<title>Pengeluaran Realtime</title>
 
-<link rel="stylesheet" href="style.css">
+<style>
+body{
+font-family:Arial;
+background:#f3f4f6;
+padding:15px;
+}
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+.box{
+max-width:500px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
 
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+.card{
+background:#f9fafb;
+padding:15px;
+border-radius:10px;
+margin-bottom:15px;
+}
+
+.total{
+font-size:28px;
+font-weight:bold;
+color:red;
+}
+
+.month{
+color:blue;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:10px;
+border-radius:10px;
+border:1px solid #ddd;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:10px;
+font-size:16px;
+}
+
+.item{
+display:flex;
+justify-content:space-between;
+padding:10px;
+background:#f3f4f6;
+border-radius:10px;
+margin-top:8px;
+}
+</style>
 </head>
-
 <body>
 
-<div class="sidebar">
+<div class="box">
 
-<h2>🛒 KASIR</h2>
+<h1>💸 Pengeluaran Realtime</h1>
 
-<button onclick="filterKategori('Semua')">
-Semua
-</button>
+<div class="card">
+<h3>Total Hari Ini</h3>
+<div class="total" id="harian">Rp0</div>
+</div>
 
-<button onclick="filterKategori('Sembako')">
-Sembako
-</button>
+<div class="card">
+<h3>Total Bulan Ini</h3>
+<div class="total month" id="bulanan">Rp0</div>
+</div>
 
-<button onclick="filterKategori('Snack')">
-Snack
-</button>
+<input type="text" id="nama" placeholder="Nama Pengeluaran">
 
-<button onclick="filterKategori('Protein')">
-Protein
-</button>
+<input type="number" id="jumlah" placeholder="Jumlah">
+
+<button onclick="tambah()">Tambah</button>
+
+<div id="list"></div>
 
 </div>
 
-<div class="main">
+<script type="module">
 
-<div class="topbar">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-<h1>KASIR TOKO</h1>
+import {
+getDatabase,
+ref,
+push,
+set,
+onValue
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-<input
-id="searchInput"
-type="text"
-placeholder="Cari produk..."
-onkeyup="renderProduk()">
+/* FIREBASE */
 
-<button
-class="cart-btn"
-onclick="toggleCart()">
+const firebaseConfig = {
 
-🛒 Keranjang
+apiKey: "APIKEY",
+authDomain: "PROJECT.firebaseapp.com",
+databaseURL: "https://PROJECT-default-rtdb.firebaseio.com",
+projectId: "PROJECT",
+storageBucket: "PROJECT.appspot.com",
+messagingSenderId: "123",
+appId: "APPID"
 
-<span id="cartCount">
-0
-</span>
+};
 
-</button>
+const app = initializeApp(firebaseConfig);
 
+const db = getDatabase(app);
+
+/* TANGGAL */
+
+const now = new Date();
+
+const bulan =
+now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,'0');
+
+const hari =
+bulan+"-"+String(now.getDate()).padStart(2,'0');
+
+/* REF */
+
+const refHarian =
+ref(db,"pengeluaran/"+bulan+"/"+hari);
+
+const refBulanan =
+ref(db,"pengeluaran/"+bulan);
+
+/* FORMAT */
+
+function rupiah(angka){
+return "Rp"+angka.toLocaleString("id-ID");
+}
+
+/* TAMBAH DATA */
+
+window.tambah = function(){
+
+const nama =
+document.getElementById("nama").value;
+
+const jumlah =
+parseInt(document.getElementById("jumlah").value);
+
+if(!nama || !jumlah){
+alert("Lengkapi data");
+return;
+}
+
+const newData = push(refHarian);
+
+set(newData,{
+nama:nama,
+jumlah:jumlah,
+waktu:Date.now()
+});
+
+document.getElementById("nama").value="";
+document.getElementById("jumlah").value="";
+
+}
+
+/* REALTIME HARIAN */
+
+onValue(refHarian,(snapshot)=>{
+
+let total = 0;
+
+let html = "";
+
+snapshot.forEach((child)=>{
+
+const data = child.val();
+
+if(data.jumlah){
+
+total += data.jumlah;
+
+html += `
+<div class="item">
+<span>${data.nama}</span>
+<b>${rupiah(data.jumlah)}</b>
 </div>
+`;
 
-<div
-id="productList"
-class="product-grid">
+}
 
-</div>
+});
 
-</div>
+document.getElementById("harian").innerHTML =
+rupiah(total);
 
-<!-- CART -->
+document.getElementById("list").innerHTML =
+html;
 
-<div
-class="cart-box"
-id="cartBox">
+});
 
-<div class="cart-header">
+/* REALTIME BULANAN */
 
-<h2>Keranjang</h2>
+onValue(refBulanan,(snapshot)=>{
 
-<button
-class="close-btn"
-onclick="toggleCart()">
+let totalBulanan = 0;
 
-✕
+snapshot.forEach((tanggal)=>{
 
-</button>
+tanggal.forEach((item)=>{
 
-</div>
+const data = item.val();
 
-<input
-type="text"
-id="namaKasir"
-placeholder="Nama Kasir">
+if(data.jumlah){
+totalBulanan += data.jumlah;
+}
 
-<input
-type="text"
-id="namaPembeli"
-placeholder="Nama Pembeli">
+});
 
-<select id="pembayaran">
+});
 
-<option>
-Cash
-</option>
+document.getElementById("bulanan").innerHTML =
+rupiah(totalBulanan);
 
-<option>
-Transfer
-</option>
+});
 
-</select>
-
-<div id="cartItems"></div>
-
-<div id="cartTotal"></div>
-
-<button
-class="checkout-btn"
-onclick="window.print()">
-
-🖨 Print Struk
-
-</button>
-
-<button
-class="reset-btn"
-onclick="resetCart()">
-
-Reset
-
-</button>
-
-</div>
-
-<!-- POPUP -->
-
-<div
-class="popup"
-id="popupBox">
-
-<div class="popup-content">
-
-<h2 id="popupNama">
-Produk
-</h2>
-
-<p id="popupHarga">
-Rp 0
-</p>
-
-<div class="popup-qty">
-
-<button onclick="popupKurang()">
-−
-</button>
-
-<input
-type="number"
-id="popupQty"
-value="1"
-min="1">
-
-<button onclick="popupTambah()">
-+
-</button>
-
-</div>
-
-<button
-class="popup-btn"
-onclick="confirmAddCart()">
-
-Tambah
-
-</button>
-
-<button
-class="popup-close"
-onclick="closePopup()">
-
-Tutup
-
-</button>
-
-</div>
-
-</div>
-<!-- STRUK PRINT -->
-
-<div id="printArea">
-
-<h2>TOKO DEFANA</h2>
-
-<p>
-Jl. Contoh Alamat
-</p>
-
-<hr>
-
-<div id="printContent"></div>
-
-<hr>
-
-<p class="center">
-Terima Kasih
-</p>
-
-</div>
-<script src="script.js"></script>
+</script>
 
 </body>
 </html>
