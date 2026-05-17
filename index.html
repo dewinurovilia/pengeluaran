@@ -163,79 +163,7 @@ transform:translateY(0);
 
 </div>
 
-<script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getDatabase,
-ref,
-push,
-set,
-onValue
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-/* FIREBASE */
-
-const firebaseConfig = {
-apiKey: "AIzaSyAD8NyqcxooL2ga3dG918kYufrOn-5ZMwI",
-authDomain: "pengeluaran-c2c6d.firebaseapp.com",
-databaseURL: "https://pengeluaran-c2c6d-default-rtdb.asia-southeast1.firebasedatabase.app/",
-projectId: "pengeluaran-c2c6d",
-storageBucket: "pengeluaran-c2c6d.firebasestorage.app",
-messagingSenderId: "385326707991",
-appId: "1:385326707991:web:dd833732ad3b60e1d93352"
-};
-
-const app = initializeApp(firebaseConfig);
-
-const db = getDatabase(app);
-
-/* TANGGAL */
-
-const now = new Date();
-
-const bulan =
-now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,'0');
-
-const hari =
-bulan+"-"+String(now.getDate()).padStart(2,'0');
-
-/* REF */
-
-const refHarian =
-ref(db,"pengeluaran/"+bulan+"/"+hari);
-
-const refBulanan =
-ref(db,"pengeluaran/"+bulan);
-
-/* FORMAT */
-
-function rupiah(angka){
-return "Rp"+angka.toLocaleString("id-ID");
-}
-
-/* TAMBAH DATA */
-
-window.tambah = function(){
-
-const nama =
-document.getElementById("nama").value;
-
-const jumlah =
-parseInt(document.getElementById("jumlah").value);
-
-if(!nama || !jumlah){
-alert("Lengkapi data");
-return;
-}
-
-const newData = push(refHarian);
-
-set(newData,{
-nama:nama,
-jumlah:jumlah,
-waktu:Date.now()
 });
 
 /* NOTIFIKASI */
@@ -260,66 +188,109 @@ onValue(refHarian,(snapshot)=>{
 
 let total = 0;
 
-let html = "";
+<script type="module">
 
-snapshot.forEach((child)=>{
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-const data = child.val();
+import {
+getDatabase,
+ref,
+push,
+set,
+onValue
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-if(data.jumlah){
+/* FIREBASE */
 
-total += data.jumlah;
+const firebaseConfig = {
+apiKey: "AIzaSyAD8NyqcxooL2ga3dG918kYufrOn-5ZMwI",
+authDomain: "pengeluaran-c2c6d.firebaseapp.com",
+databaseURL: "https://pengeluaran-c2c6d-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "pengeluaran-c2c6d",
+storageBucket: "pengeluaran-c2c6d.firebasestorage.app",
+messagingSenderId: "385326707991",
+appId: "1:385326707991:web:dd833732ad3b60e1d93352"
+};
 
-html = `
-<div class="item">
-<span>${data.nama}</span>
-<b>${rupiah(data.jumlah)}</b>
-</div>
-` + html;
-  
-html = `
-<div class="item">
-<span>${data.nama}</span>
-<b>${rupiah(data.jumlah)}</b>
-</div>
-` + html;
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app);
+
+/* TANGGAL */
+
+const now = new Date();
+
+const bulan =
+now.getFullYear() + "-" +
+String(now.getMonth()+1).padStart(2,'0');
+
+const hari =
+bulan + "-" +
+String(now.getDate()).padStart(2,'0');
+
+/* DATABASE */
+
+const refHarian =
+ref(db,"pengeluaran/"+bulan+"/"+hari);
+
+const refBulanan =
+ref(db,"pengeluaran/"+bulan);
+
+/* FORMAT RUPIAH */
+
+function rupiah(angka){
+return "Rp" + angka.toLocaleString("id-ID");
+}
+
+/* TAMBAH DATA */
+
+window.tambah = function(){
+
+const nama =
+document.getElementById("nama").value;
+
+const jumlah =
+parseInt(document.getElementById("jumlah").value);
+
+if(!nama || !jumlah){
+
+alert("Lengkapi data");
+
+return;
 
 }
 
+const newData = push(refHarian);
+
+set(newData,{
+
+nama:nama,
+jumlah:jumlah,
+waktu:Date.now()
+
 });
 
-document.getElementById("harian").innerHTML =
-rupiah(total);
+/* NOTIF */
 
-document.getElementById("list").innerHTML =
-html;
+const notif =
+document.getElementById("notif");
 
-});
+notif.style.display = "block";
 
-/* REALTIME BULANAN */
+setTimeout(()=>{
 
-onValue(refBulanan,(snapshot)=>{
+notif.style.display = "none";
 
-let totalBulanan = 0;
+},2000);
 
-snapshot.forEach((tanggal)=>{
+/* RESET INPUT */
 
-tanggal.forEach((item)=>{
+document.getElementById("nama").value = "";
 
-const data = item.val();
+document.getElementById("jumlah").value = "";
 
-if(data.jumlah){
-totalBulanan += data.jumlah;
 }
 
-});
-
-});
-
-document.getElementById("bulanan").innerHTML =
-rupiah(totalBulanan);
-
-});
 /* REALTIME HARIAN */
 
 onValue(refHarian,(snapshot)=>{
@@ -336,12 +307,14 @@ if(data.jumlah){
 
 total += data.jumlah;
 
-html += `
+/* DATA BARU PALING ATAS */
+
+html = `
 <div class="item">
 <span>${data.nama}</span>
 <b>${rupiah(data.jumlah)}</b>
 </div>
-`;
+` + html;
 
 }
 
@@ -368,7 +341,9 @@ tanggal.forEach((item)=>{
 const data = item.val();
 
 if(data.jumlah){
+
 totalBulanan += data.jumlah;
+
 }
 
 });
@@ -381,7 +356,6 @@ rupiah(totalBulanan);
 });
 
 </script>
-
 </body>
 <div id="notif">✅ Pengeluaran berhasil ditambahkan</div>
 </html>
