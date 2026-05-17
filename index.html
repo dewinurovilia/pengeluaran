@@ -418,7 +418,151 @@ document.getElementById("bulanan").innerHTML =
 rupiah(totalBulanan);
 
 });
+/* =========================
+DOWNLOAD EXCEL HARIAN
+========================= */
 
+window.downloadHarian = function(){
+
+onValue(refHarian,(snapshot)=>{
+
+let dataExcel = [];
+
+snapshot.forEach((child)=>{
+
+const data = child.val();
+
+if(data.jumlah){
+
+dataExcel.push({
+"Nama Pengeluaran": data.nama,
+"Jumlah": data.jumlah,
+"Tanggal": hari
+});
+
+}
+
+});
+
+const ws = XLSX.utils.json_to_sheet(dataExcel);
+
+const wb = XLSX.utils.book_new();
+
+XLSX.utils.book_append_sheet(wb,ws,"Harian");
+
+XLSX.writeFile(wb,`pengeluaran-harian-${hari}.xlsx`);
+
+},{onlyOnce:true});
+
+}
+
+/* =========================
+DOWNLOAD EXCEL MINGGUAN
+========================= */
+
+window.downloadMingguan = function(){
+
+onValue(refBulanan,(snapshot)=>{
+
+let dataExcel = [];
+
+const now = new Date();
+
+const tujuhHari = 7 * 24 * 60 * 60 * 1000;
+
+snapshot.forEach((tanggal)=>{
+
+tanggal.forEach((item)=>{
+
+const data = item.val();
+
+if(data.waktu){
+
+const selisih = now - data.waktu;
+
+if(selisih <= tujuhHari){
+
+const date = new Date(data.waktu);
+
+const tgl =
+date.getFullYear()+"-"+
+String(date.getMonth()+1).padStart(2,'0')+"-"+
+String(date.getDate()).padStart(2,'0');
+
+dataExcel.push({
+"Nama Pengeluaran": data.nama,
+"Jumlah": data.jumlah,
+"Tanggal": tgl
+});
+
+}
+
+}
+
+});
+
+});
+
+const ws = XLSX.utils.json_to_sheet(dataExcel);
+
+const wb = XLSX.utils.book_new();
+
+XLSX.utils.book_append_sheet(wb,ws,"Mingguan");
+
+XLSX.writeFile(wb,`pengeluaran-mingguan.xlsx`);
+
+},{onlyOnce:true});
+
+}
+
+/* =========================
+DOWNLOAD EXCEL BULANAN
+========================= */
+
+window.downloadBulanan = function(){
+
+onValue(refBulanan,(snapshot)=>{
+
+let dataExcel = [];
+
+snapshot.forEach((tanggal)=>{
+
+tanggal.forEach((item)=>{
+
+const data = item.val();
+
+if(data.waktu){
+
+const date = new Date(data.waktu);
+
+const tgl =
+date.getFullYear()+"-"+
+String(date.getMonth()+1).padStart(2,'0')+"-"+
+String(date.getDate()).padStart(2,'0');
+
+dataExcel.push({
+"Nama Pengeluaran": data.nama,
+"Jumlah": data.jumlah,
+"Tanggal": tgl
+});
+
+}
+
+});
+
+});
+
+const ws = XLSX.utils.json_to_sheet(dataExcel);
+
+const wb = XLSX.utils.book_new();
+
+XLSX.utils.book_append_sheet(wb,ws,"Bulanan");
+
+XLSX.writeFile(wb,`pengeluaran-bulanan-${bulan}.xlsx`);
+
+},{onlyOnce:true});
+
+}
 </script>
 
 </body>
