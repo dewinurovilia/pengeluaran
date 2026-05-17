@@ -7,8 +7,8 @@
 
 <style>
 body{
-font-family:Arial;
-background:#f3f4f6;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
 padding:15px;
 }
 
@@ -17,57 +17,123 @@ max-width:500px;
 margin:auto;
 background:white;
 padding:20px;
-border-radius:15px;
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
+border-radius:25px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
 }
 
 h1{
 text-align:center;
-margin-bottom:20px;
+margin-bottom:25px;
+font-size:28px;
 }
 
 .card{
-background:#f9fafb;
-padding:15px;
-border-radius:10px;
+background:#f8fafc;
+padding:20px;
+border-radius:20px;
+margin-bottom:20px;
+}
+
+.card h3{
+font-size:18px;
 margin-bottom:15px;
+color:#334155;
 }
 
 .total{
-font-size:28px;
+font-size:42px;
 font-weight:bold;
-color:red;
+color:#ef4444;
 }
 
 .month{
-color:blue;
+color:#2563eb;
 }
 
 input{
 width:100%;
-padding:12px;
-margin-bottom:10px;
-border-radius:10px;
-border:1px solid #ddd;
+padding:16px;
+margin-bottom:15px;
+border-radius:15px;
+border:2px solid #e2e8f0;
+font-size:17px;
+outline:none;
+transition:0.2s;
+}
+
+input:focus{
+border-color:#2563eb;
 }
 
 button{
 width:100%;
-padding:12px;
+padding:16px;
 background:#2563eb;
 color:white;
 border:none;
-border-radius:10px;
-font-size:16px;
+border-radius:18px;
+font-size:20px;
+font-weight:bold;
+cursor:pointer;
+transition:0.2s;
+}
+
+button:hover{
+transform:scale(0.98);
+background:#1d4ed8;
 }
 
 .item{
 display:flex;
 justify-content:space-between;
-padding:10px;
-background:#f3f4f6;
-border-radius:10px;
-margin-top:8px;
+align-items:center;
+padding:18px;
+background:#f8fafc;
+border-radius:18px;
+margin-top:12px;
+font-size:18px;
+animation:muncul 0.3s ease;
+}
+
+.item b{
+font-size:22px;
+}
+
+#notif{
+position:fixed;
+top:20px;
+right:20px;
+background:#22c55e;
+color:white;
+padding:15px 20px;
+border-radius:15px;
+font-weight:bold;
+display:none;
+z-index:999;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+animation:slide 0.3s ease;
+}
+
+@keyframes slide{
+from{
+transform:translateY(-20px);
+opacity:0;
+}
+to{
+transform:translateY(0);
+opacity:1;
+}
+}
+
+@keyframes muncul{
+from{
+opacity:0;
+transform:translateY(10px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
 }
 </style>
 </head>
@@ -171,6 +237,17 @@ nama:nama,
 jumlah:jumlah,
 waktu:Date.now()
 });
+
+/* NOTIFIKASI */
+
+const notif =
+document.getElementById("notif");
+
+notif.style.display = "block";
+
+setTimeout(()=>{
+notif.style.display = "none";
+},2000);
 
 document.getElementById("nama").value="";
 document.getElementById("jumlah").value="";
@@ -299,4 +376,5 @@ rupiah(totalBulanan);
 </script>
 
 </body>
+<div id="notif">✅ Pengeluaran berhasil ditambahkan</div>
 </html>
