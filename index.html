@@ -177,7 +177,21 @@ opacity:1;
 transform:translateY(0);
 }
 }
+.download-menu{
+margin-top:15px;
+display:grid;
+gap:10px;
+}
 
+.download-menu button{
+background:#16a34a;
+font-size:16px;
+padding:14px;
+}
+
+.download-menu button:hover{
+background:#15803d;
+}
 </style>
 </head>
 <body>
@@ -225,10 +239,25 @@ transform:translateY(0);
 <button onclick="tambah()">
 Tambah Pengeluaran
 </button>
+<div class="download-menu">
 
+<button onclick="downloadHarian()">
+📅 Download Harian
+</button>
+
+<button onclick="downloadMingguan()">
+🗓️ Download Mingguan
+</button>
+
+<button onclick="downloadBulanan()">
+📁 Download Bulanan
+</button>
+
+</div>
 <div id="list"></div>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <script type="module">
 
